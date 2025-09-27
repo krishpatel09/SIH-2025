@@ -176,6 +176,7 @@ app.listen(PORT, () => {
   console.log(`🌐 Health check: http://localhost:${PORT}/health`);
   console.log(`🔑 Auth endpoints: http://localhost:${PORT}/api/auth`);
   console.log(`💬 Chatbot endpoints: http://localhost:${PORT}/api/chat`);
+  console.log(`🌍 CORS: Allowing origins: ${allowedOrigins.join(', ')}`);
 });
 
 module.exports = app;
