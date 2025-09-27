@@ -33,12 +33,18 @@ if (process.env.NODE_ENV === 'production') {
   allowedOrigins.push('https://sih-2025-steel.vercel.app');
 }
 
+// Ensure Vercel domain is always included
+if (!allowedOrigins.includes('https://sih-2025-steel.vercel.app')) {
+  allowedOrigins.push('https://sih-2025-steel.vercel.app');
+}
+
 // More permissive CORS for development and production
 app.use(cors({
   origin: function (origin, callback) {
     console.log('=== CORS DEBUG ===');
     console.log('Request origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
+    console.log('Environment:', process.env.NODE_ENV);
     console.log('==================');
     
     // Allow requests with no origin (like mobile apps, curl, Postman)
@@ -47,14 +53,26 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // Check if origin is in allowed list
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('CORS: ✅ Allowed for origin:', origin);
+    // Normalize origin (remove trailing slash)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const normalizedAllowedOrigins = allowedOrigins.map(o => o.replace(/\/$/, ''));
+    
+    // Check if origin is in allowed list (exact match)
+    if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
+      console.log('CORS: ✅ Allowed for origin:', normalizedOrigin);
       callback(null, true);
     } else {
-      console.log('CORS: ❌ Blocked origin:', origin);
-      console.log('CORS: Available origins:', allowedOrigins);
-      callback(new Error(`CORS policy: Origin ${origin} is not allowed`));
+      console.log('CORS: ❌ Blocked origin:', normalizedOrigin);
+      console.log('CORS: Available origins:', normalizedAllowedOrigins);
+      console.log('CORS: Exact match failed, checking partial matches...');
+      
+      // Additional check for Vercel domains (more permissive)
+      if (normalizedOrigin.includes('sih-2025-steel.vercel.app')) {
+        console.log('CORS: ✅ Allowing Vercel domain:', normalizedOrigin);
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy: Origin ${normalizedOrigin} is not allowed`));
+      }
     }
   },
   credentials: true,
@@ -66,10 +84,13 @@ app.use(cors({
     'Accept',
     'Origin',
     'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
+    'Access-Control-Request-Headers',
+    'Cache-Control',
+    'Pragma'
   ],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  preflightContinue: false
 }));
 
 // Logging
@@ -106,7 +127,31 @@ app.get('/cors-test', (req, res) => {
     origin: req.headers.origin,
     timestamp: new Date().toISOString(),
     allowedOrigins: allowedOrigins,
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    headers: {
+      'Access-Control-Allow-Origin': req.headers.origin,
+      'Access-Control-Allow-Credentials': 'true'
+    }
+  });
+});
+
+// Additional CORS debug endpoint
+app.get('/cors-debug', (req, res) => {
+  const origin = req.headers.origin;
+  const normalizedOrigin = origin ? origin.replace(/\/$/, '') : null;
+  const normalizedAllowedOrigins = allowedOrigins.map(o => o.replace(/\/$/, ''));
+  
+  res.json({
+    debug: {
+      requestOrigin: origin,
+      normalizedOrigin: normalizedOrigin,
+      allowedOrigins: allowedOrigins,
+      normalizedAllowedOrigins: normalizedAllowedOrigins,
+      isAllowed: normalizedOrigin ? normalizedAllowedOrigins.includes(normalizedOrigin) : false,
+      isVercelDomain: normalizedOrigin ? normalizedOrigin.includes('sih-2025-steel.vercel.app') : false,
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
