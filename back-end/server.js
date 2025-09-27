@@ -38,7 +38,6 @@ app.use(cors({
   origin: function (origin, callback) {
     console.log('=== CORS DEBUG ===');
     console.log('Request origin:', origin);
-    console.log('Environment:', process.env.NODE_ENV);
     console.log('Allowed origins:', allowedOrigins);
     console.log('==================');
     
