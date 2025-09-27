@@ -2,6 +2,7 @@
   "name": "jharkhand-tourism-platform",
   "version": "0.1.0",
   "private": true,
+  "description": "Jharkhand Tourism Platform - Fixed import paths for Vercel deployment",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
