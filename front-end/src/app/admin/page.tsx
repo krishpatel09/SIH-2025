@@ -1,7 +1,7 @@
 'use client';
 
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
+import { ProtectedRoute } from '../../components/auth/ProtectedRoute';
+import { useAuth } from '../../contexts/AuthContext';
 import { useState } from 'react';
 import { 
   BarChart3, 
@@ -18,9 +18,9 @@ import {
   Database,
   Shield
 } from 'lucide-react';
-import Header from '@/components/Header';
-import AddDestinationModal from '@/components/admin/AddDestinationModal';
-import AddClusterModal from '@/components/admin/AddClusterModal';
+import Header from '../../components/Header';
+import AddDestinationModal from '../../components/admin/AddDestinationModal';
+import AddClusterModal from '../../components/admin/AddClusterModal';
 
 const mockData = {
   totalVisitors: 125430,
