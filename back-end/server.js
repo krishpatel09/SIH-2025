@@ -20,58 +20,10 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration - Enhanced for production deployment
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://sih-2025-steel.vercel.app',
-  'https://sih-2025-steel.vercel.app/',
-  process.env.FRONTEND_URL
+const allowedOrigins = ['https://sih-2025-steel.vercel.app',
+process.env.FRONTEND_URL
 ].filter(Boolean); // Remove any undefined values
 
-// Add production domains explicitly
-if (process.env.NODE_ENV === 'production') {
-  allowedOrigins.push('https://sih-2025-steel.vercel.app');
-}
-
-// More permissive CORS for development and production
-app.use(cors({
-  origin: function (origin, callback) {
-    console.log('=== CORS DEBUG ===');
-    console.log('Request origin:', origin);
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('Allowed origins:', allowedOrigins);
-    console.log('==================');
-    
-    // Allow requests with no origin (like mobile apps, curl, Postman)
-    if (!origin) {
-      console.log('CORS: Allowing request with no origin');
-      return callback(null, true);
-    }
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('CORS: ✅ Allowed for origin:', origin);
-      callback(null, true);
-    } else {
-      console.log('CORS: ❌ Blocked origin:', origin);
-      console.log('CORS: Available origins:', allowedOrigins);
-      callback(new Error(`CORS policy: Origin ${origin} is not allowed`));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
-  ],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
-}));
 
 // Logging
 app.use(morgan('combined'));
