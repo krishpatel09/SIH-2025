@@ -1,5 +1,35 @@
 // API Base URL Configuration
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getApiBaseUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  
+  // If environment variable is set, use it
+  if (envUrl) {
+    // Ensure protocol is included
+    if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+      return envUrl;
+    } else {
+      // Add protocol based on environment
+      const protocol = process.env.NODE_ENV === 'production' ? 'https://' : 'http://';
+      return `${protocol}${envUrl}`;
+    }
+  }
+  
+  // Fallback URLs based on environment
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://smart-india-hackthon-2025.onrender.com/api';
+  } else {
+    return 'http://localhost:5000/api';
+  }
+};
+
+export const API_BASE_URL = getApiBaseUrl();
+
+// Debug logging (only in development)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+  console.log('🌍 Environment:', process.env.NODE_ENV);
+  console.log('🔧 NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+}
 
 // API Paths Configuration
 export const API_PATHS = {
