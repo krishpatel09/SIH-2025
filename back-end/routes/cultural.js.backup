@@ -1,0 +1,23 @@
+const express = require('express');
+const CulturalController = require('../controllers/CulturalController');
+const { validateCulturalElement } = require('../middleware/validation');
+
+const router = express.Router();
+const culturalController = new CulturalController();
+
+// GET all cultural elements
+router.get('/', culturalController.getAllCulturalElements.bind(culturalController));
+
+// GET cultural element by ID
+router.get('/:id', culturalController.getCulturalElementById.bind(culturalController));
+
+// POST new cultural element (admin only - add auth middleware later)
+router.post('/', validateCulturalElement, culturalController.createCulturalElement.bind(culturalController));
+
+// PUT update cultural element (admin only - add auth middleware later)
+router.put('/:id', validateCulturalElement, culturalController.updateCulturalElement.bind(culturalController));
+
+// DELETE cultural element (admin only - add auth middleware later)
+router.delete('/:id', culturalController.deleteCulturalElement.bind(culturalController));
+
+module.exports = router;

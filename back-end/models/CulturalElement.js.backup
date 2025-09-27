@@ -1,0 +1,17 @@
+const BaseModel = require('./BaseModel');
+
+class CulturalElement extends BaseModel {
+  constructor() {
+    super('cultural_elements');
+  }
+
+  // Get all cultural elements ordered by creation date
+  async findAll() {
+    return await super.findAll({
+      orderBy: 'created_at',
+      orderDirection: { ascending: true }
+    });
+  }
+}
+
+module.exports = CulturalElement;
